@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" id="name" />
+    <input type="text" id="password" />
+    <input type="text" id="yzm" />
+
+    <img id="img" src="" alt="" />
+    <button id="submit">登陆</button>
+    <button id="stremBtn">文件下载</button>
+    <button id="rxjsbtn">rxjs</button>
+  </body>
+  <script>
+    function getId(id) {
+      return document.getElementById(id);
+    }
+    window.onload = function () {
+      // 处理跨域
+      getId('img').src = 'http://localhost:3000/user/code';
+    };
+    getId('img').onclick = function () {
+      getId('img').src =
+        'http://localhost:3000/user/code' + '?' + Math.random();
+    };
+    getId('submit').onclick = function () {
+      const name = getId('name').value;
+      const password = getId('password').value;
+      const yzm = getId('yzm').value;
+      const xhr = new XMLHttpRequest();
+      xhr.open('post', 'http://localhost:3000/user/create');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      // 设置 cookie
+      //   xhr.withCredentials = true;
+      // 发送请求
+      xhr.send(JSON.stringify({ name, password, yzm }));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          const data = JSON.parse(xhr.responseText);
+          if (data.code === 0) {
+            alert('登陆成功');
+          }
+        }
+      };
+    };
+    getId('stremBtn').onclick = async () => {
+      const res = await fetch('http://localhost:3000/upload/strem').then(
+        (res) => res.arrayBuffer(),
+      );
+      const blob = new Blob([res], { type: 'application/octet-stream' });
+      const a = document.createElement('a');
+      document.body.appendChild(a);
+      a.style = 'display: none';
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = 'strem.zip';
+      a.click();
+    };
+  </script>
+</html>
